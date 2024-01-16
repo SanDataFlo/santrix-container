@@ -1,0 +1,200 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "FastAPI",
+        "version": "0.1.0"
+    },
+    "servers": [
+        {
+          "url": "http://127.0.0.1:8000/"
+        }
+    ],
+    "paths": {
+        "/search/{query}": {
+            "get": {
+                "summary": "Search",
+                "operationId": "search_search__query__get",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Query"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/additem": {
+            "post": {
+                "summary": "Add Item",
+                "operationId": "add_item_additem_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeviceItem"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/openapi.json": {
+            "get": {
+                "summary": "Custom Openapi Json",
+                "operationId": "custom_openapi_json_openapi_json_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/openapi.yaml": {
+            "get": {
+                "summary": "Custom Openapi Yaml",
+                "operationId": "custom_openapi_yaml_openapi_yaml_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "DeviceItem": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "title": "Id"
+                    },
+                    "description": {
+                        "type": "string",
+                        "title": "Description"
+                    },
+                    "stock": {
+                        "type": "integer",
+                        "title": "Stock"
+                    },
+                    "manufacturercode": {
+                        "type": "string",
+                        "title": "Manufacturercode"
+                    },
+                    "manufacturer_article_id": {
+                        "type": "string",
+                        "title": "Manufacturer Article Id"
+                    },
+                    "searchstring": {
+                        "type": "string",
+                        "title": "Searchstring"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "description",
+                    "stock",
+                    "manufacturercode",
+                    "manufacturer_article_id",
+                    "searchstring"
+                ],
+                "title": "DeviceItem"
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                                "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            }
+        }
+    }
+}
