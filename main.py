@@ -60,9 +60,9 @@ def search_in_asset_list(query: str):
             # If the query string is present, create a DeviceItem object and fill the attributes with the values from the Excel file
             device_item = DeviceItem(id=str(row["Nr."]), description=row["Beschreibung"], stock=row["Lagerbestand"], manufacturercode=str(row["Herstellercode"]),  manufacturer_article_id=str(row["Herstellerartikelnr."]), searchstring=row["Suchbegriff"])
             # Add the JSON object to the json_results list
-            json_results.append(device_item.model_dump())
+            json_results.append(device_item)
     # Return the json_results list
-    return JSONResponse(content={"Results": json_results})
+    return json_results
 
 
 @app.get("/get_device_by_id/{id}", response_model=DeviceItem)
@@ -78,7 +78,7 @@ def get_device_by_id(id: str):
                                      manufacturercode=str(row["Herstellercode"]),
                                      manufacturer_article_id=str(row["Herstellerartikelnr."]),
                                      searchstring=row["Suchbegriff"])
-            return JSONResponse(content={"DeviceItem": device_item.model_dump()})
+            return device_item
 
 
 @app.get("/get_user_by_userid/{userid}", response_model=User)
@@ -91,7 +91,7 @@ def get_user_by_userid(userid: int):
         if row["MitarbeiterID"] == userid:
             user = User(userid=userid, username=row["MitarbeiterName"], usermail=row["Mail"], superior_id=row["VorgesetzterID"])
             # Add the JSON object to the json_results list
-            return JSONResponse(content={"User": user.model_dump()})
+            return user
 
 
 @app.get("/get_devices_by_userid/{userid}", response_model=List[DeviceItem])
@@ -110,9 +110,9 @@ def get_devices_by_userid(userid: int):
                                      manufacturer_article_id=str(row["Herstellerartikelnr."]),
                                      searchstring=row["Suchbegriff"])
             # Add the JSON object to the json_results list
-            json_results.append(device_item.model_dump())
+            json_results.append(device_item)
     # Return the json_results list
-    return JSONResponse(content={"DeviceItem": json_results})
+    return json_results
 
 
 @app.post("/add_ticket_it_support", response_model=TicketItSupport)
@@ -135,11 +135,11 @@ def add_ticket_it_support(ticket_it_support: TicketItSupport):
     df.to_excel("ticket-list-it-support.xlsx", index=False)
     # Methode zum Schreiben einer Teams Nachricht
     # Return a success message
-    return JSONResponse(content={"TicketSupport:": ticket_it_support.model_dump()})
+    return ticket_it_support
 
 
 @app.post("/add_ticket_orders")
-def add_ticket_it_support(ticket_order: TicketOrder):
+def add_ticket_orders(ticket_order: TicketOrder):
     # Read the Excel file as a DataFrame
     df = pd.read_excel("ticket-list-orders.xlsx")
     # Create a new row as a dictionary
@@ -158,7 +158,7 @@ def add_ticket_it_support(ticket_order: TicketOrder):
     # Methode zum Schreiben einer Teams-Nachricht
 
     # Return a success message
-    return JSONResponse(content={"TicketBestellung": ticket_order.model_dump()})
+    return ticket_order
 
 
 @app.post("/add_item")
