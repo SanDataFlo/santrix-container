@@ -1,13 +1,15 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
+from fastapi.responses import JSONResponse
 import pandas as pd
 import yaml
 from pydantic import BaseModel
+from typing import List
 
 api_titel = "SanDyy API Container"
 api_version = "1.0.2"
 api_summary = "API communicates between watsonxAssistant and the database"
-server = ""
+server = "https://application-3e.1b7hlo69yoj4.eu-de.codeengine.appdomain.cloud/"
 
 
 class DeviceItem(BaseModel):
@@ -45,7 +47,7 @@ class TicketOrder (BaseModel):
 app = FastAPI(openapi_version="3.0.1")
 
 
-@app.get("/search_in_asset_list/{query}")
+@app.get("/search_in_asset_list/{query}", response_model=List[DeviceItem])
 def search_in_asset_list(query: str):
     # Read the data from an Excel file
     df = pd.read_excel("asset-list.xlsx")
@@ -58,12 +60,12 @@ def search_in_asset_list(query: str):
             # If the query string is present, create a DeviceItem object and fill the attributes with the values from the Excel file
             device_item = DeviceItem(id=str(row["Nr."]), description=row["Beschreibung"], stock=row["Lagerbestand"], manufacturercode=str(row["Herstellercode"]),  manufacturer_article_id=str(row["Herstellerartikelnr."]), searchstring=row["Suchbegriff"])
             # Add the JSON object to the json_results list
-            json_results.append(device_item)
+            json_results.append(device_item.model_dump())
     # Return the json_results list
-    return {"Results": json_results}
+    return JSONResponse(content={"Results": json_results})
 
 
-@app.get("/get_device_by_id/{id}")
+@app.get("/get_device_by_id/{id}", response_model=DeviceItem)
 def get_device_by_id(id: str):
     # Read the data from an Excel file
     df = pd.read_excel("asset-list.xlsx")
@@ -76,11 +78,10 @@ def get_device_by_id(id: str):
                                      manufacturercode=str(row["Herstellercode"]),
                                      manufacturer_article_id=str(row["Herstellerartikelnr."]),
                                      searchstring=row["Suchbegriff"])
-            return {"DeviceItem": device_item}
+            return JSONResponse(content={"DeviceItem": device_item.model_dump()})
 
 
-
-@app.get("/get_user_by_userid/{userid}")
+@app.get("/get_user_by_userid/{userid}", response_model=User)
 def get_user_by_userid(userid: int):
     # Read the data from an Excel file
     df = pd.read_excel("hierachy.xlsx")
@@ -90,10 +91,10 @@ def get_user_by_userid(userid: int):
         if row["MitarbeiterID"] == userid:
             user = User(userid=userid, username=row["MitarbeiterName"], usermail=row["Mail"], superior_id=row["VorgesetzterID"])
             # Add the JSON object to the json_results list
-        return {"User": user}
+            return JSONResponse(content={"User": user.model_dump()})
 
 
-@app.get("/get_devices_by_userid/{userid}")
+@app.get("/get_devices_by_userid/{userid}", response_model=List[DeviceItem])
 def get_devices_by_userid(userid: int):
     # Read the data from an Excel file
     df = pd.read_excel("device-management.xlsx")
@@ -109,12 +110,12 @@ def get_devices_by_userid(userid: int):
                                      manufacturer_article_id=str(row["Herstellerartikelnr."]),
                                      searchstring=row["Suchbegriff"])
             # Add the JSON object to the json_results list
-            json_results.append(device_item)
+            json_results.append(device_item.model_dump())
     # Return the json_results list
-    return {"DeviceItem": json_results}
+    return JSONResponse(content={"DeviceItem": json_results})
 
 
-@app.post("/add_ticket_it_support")
+@app.post("/add_ticket_it_support", response_model=TicketItSupport)
 def add_ticket_it_support(ticket_it_support: TicketItSupport):
     # Read the Excel file as a DataFrame
     df = pd.read_excel("ticket-list-it-support.xlsx")
@@ -134,7 +135,7 @@ def add_ticket_it_support(ticket_it_support: TicketItSupport):
     df.to_excel("ticket-list-it-support.xlsx", index=False)
     # Methode zum Schreiben einer Teams Nachricht
     # Return a success message
-    return {"TicketSupport:": ticket_it_support}
+    return JSONResponse(content={"TicketSupport:": ticket_it_support.model_dump()})
 
 
 @app.post("/add_ticket_orders")
@@ -157,7 +158,7 @@ def add_ticket_it_support(ticket_order: TicketOrder):
     # Methode zum Schreiben einer Teams-Nachricht
 
     # Return a success message
-    return {"TicketBestellung": ticket_order}
+    return JSONResponse(content={"TicketBestellung": ticket_order.model_dump()})
 
 
 @app.post("/add_item")
